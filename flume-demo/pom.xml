@@ -6,7 +6,11 @@
 
     <groupId>com.flume</groupId>
     <artifactId>flume-demo</artifactId>
+    <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
+    <modules>
+        <module>elasticsearch</module>
+    </modules>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
