@@ -1,22 +1,3 @@
-/**
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-
 package com.zookeeper.watcher;
 
 import org.apache.zookeeper.AsyncCallback.*;
@@ -35,49 +16,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Random;
 
-
-/**
- * This class implements the master of the master-worker example we use
- * throughout the book. The master is responsible for tracking the list of
- * available workers, determining when there are new tasks and assigning
- * them to available workers.
- * <p>
- * The flow without crashes is like this. The master reads the list of
- * available workers and watch for changes to the list of workers. It also
- * reads the list of tasks and watches for changes to the list of tasks.
- * For each new task, it assigns the task to a worker chosen at random.
- * <p>
- * Before exercising the role of master, this ZooKeeper client first needs
- * to elect a primary master. It does it by creating a /master znode. If
- * it succeeds, then it exercises the role of master. Otherwise, it watches
- * the /master znode, and if it goes away, it tries to elect a new primary
- * master.
- * <p>
- * The states of this client are three: RUNNING, ELECTED, NOTELECTED.
- * RUNNING means that according to its view of the ZooKeeper state, there
- * is no primary master (no master has been able to acquire the /master lock).
- * If some master succeeds in creating the /master znode and this master learns
- * it, then it transitions to ELECTED if it is the primary and NOTELECTED
- * otherwise.
- * <p>
- * Because workers may crash, this master also needs to be able to reassign
- * tasks. When it watches for changes in the list of workers, it also
- * receives a notification when a znode representing a worker is gone, so
- * it is able to reassign its tasks.
- * <p>
- * A primary may crash too. In the case a primary crashes, the next primary
- * that takes over the role needs to make sure that it assigns and reassigns
- * tasks that the previous primary hasn't had time to process.
- */
 public class Master implements Watcher, Closeable {
     private static final Logger LOG = LoggerFactory.getLogger(Master.class);
 
-    /**
-     * A master process can be either running for
-     * primary master, elected primary master, or
-     * not elected, in which case it is a backup
-     * master.
-     */
     public enum MasterStates {
         RUNNING, ELECTED, NOTELECTED
     }
@@ -108,11 +49,7 @@ public class Master implements Watcher, Closeable {
     }
 
 
-    /**
-     * Creates a new ZooKeeper session.
-     *
-     * @throws IOException
-     */
+
     public void startZK() throws IOException {
         zk = new ZooKeeper(hostPort, 15000, this);
     }
@@ -814,12 +751,7 @@ public class Master implements Watcher, Closeable {
         }
     }
 
-    /**
-     * Main method providing an example of how to run the master.
-     *
-     * @param args
-     * @throws Exception
-     */
+
     public static void main(String args[]) throws Exception {
         Master m = new Master(args[0]);
         m.startZK();
@@ -827,14 +759,9 @@ public class Master implements Watcher, Closeable {
         while (!m.isConnected()) {
             Thread.sleep(100);
         }
-        /*
-         * bootstrap() creates some necessary znodes.
-         */
+
         m.bootstrap();
 
-        /*
-         * now runs for master.
-         */
         m.runForMaster();
 
         while (!m.isExpired()) {

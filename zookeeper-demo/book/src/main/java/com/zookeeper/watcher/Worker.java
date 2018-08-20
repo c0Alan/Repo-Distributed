@@ -260,7 +260,7 @@ public class Worker implements Watcher, Closeable {
         }
     };
 
-    void getTasks() {
+    public void getTasks() {
         zk.getChildren("/assign/worker-" + serverId,
                 newTaskWatcher,
                 tasksGetChildrenCallback,
